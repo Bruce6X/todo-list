@@ -2,8 +2,11 @@
 
 A simple and elegant daily todo list web application that helps you organize your tasks day by day.
 
-## Web App: 
-https://general-todo-list.vercel.app/
+## Access Web Application: 
+
+The app has been deployed to both vercel and github pages.
+- https://general-todo-list.vercel.app/
+- https://bruce6x.github.io/todo-list/
 
 ## Features
 
