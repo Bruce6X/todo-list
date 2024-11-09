@@ -145,14 +145,20 @@ select {
 .language-switch button {
     padding: 5px 10px;
     margin-left: 10px;
-    background-color: #4CAF50;
+    background-color: #1E90FF;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 80px;
+    text-align: center;
+}
+
+.language-switch button:hover {
+    background-color: #1873CC;
 }
 
 .language-switch button.active {
-    background-color: #45a049;
+    background-color: #1873CC;
     font-weight: bold;
 }
