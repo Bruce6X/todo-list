@@ -1,3 +1,67 @@
+
+// Translation
+const translations = {
+    en: {
+        title: 'Daily Todo List',
+        previousDay: 'Previous Day',
+        nextDay: 'Next Day',
+        addButton: 'Add',
+        inputPlaceholder: 'Enter a new task...',
+        deleteButton: 'Delete',
+        statusPending: 'Pending',
+        statusInProgress: 'In Progress',
+        statusCompleted: 'Completed'
+    },
+    zh: {
+        title: '每日待办事项',
+        previousDay: '前一天',
+        nextDay: '后一天',
+        addButton: '添加',
+        inputPlaceholder: '输入新任务...',
+        deleteButton: '删除',
+        statusPending: '待处理',
+        statusInProgress: '进行中',
+        statusCompleted: '已完成'
+    }
+};
+
+let currentLanguage = 'en';
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    document.getElementById('en-btn').classList.toggle('active', lang === 'en');
+    document.getElementById('zh-btn').classList.toggle('active', lang === 'zh');
+    updateInterface();
+}
+
+function updateInterface() {
+    const t = translations[currentLanguage];
+    
+    // Update title
+    document.querySelector('h1').textContent = t.title;
+    
+    // Update button text
+    document.querySelector('.date-navigation button:first-child').textContent = t.previousDay;
+    document.querySelector('.date-navigation button:last-child').textContent = t.nextDay;
+    
+    // Update input placeholder
+    document.getElementById('taskInput').placeholder = t.inputPlaceholder;
+    
+    // Update add placeholder
+    document.querySelector('.input-container button').textContent = t.addButton;
+    
+    // Update status selector
+    const statusSelect = document.getElementById('statusSelect');
+    statusSelect.innerHTML = `
+        <option value="pending">${t.statusPending}</option>
+        <option value="in-progress">${t.statusInProgress}</option>
+        <option value="completed">${t.statusCompleted}</option>
+    `;
+    
+    // Update status selector
+    renderTasks();
+}
+
 // Current selected date
 let currentDate = new Date();
 
@@ -35,6 +99,7 @@ function renderTasks() {
     const dateStr = formatDate(currentDate);
     const tasks = loadTasks(dateStr);
     const todoTiles = document.getElementById('todoTiles');
+    const t = translations[currentLanguage];
     
     todoTiles.innerHTML = `
         <div class="todo-tile">
@@ -47,8 +112,10 @@ function renderTasks() {
                               onclick="toggleTask(${index})">
                             ${task.text}
                         </span>
-                        <span class="status-badge status-${task.status}">${task.status}</span>
-                        <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+                        <span class="status-badge status-${task.status}">
+                            ${translations[currentLanguage]['status' + task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('-', '')]}
+                        </span>
+                        <button class="delete-btn" onclick="deleteTask(${index})">${t.deleteButton}</button>
                     </li>
                 `).join('')}
             </ul>
@@ -105,6 +172,10 @@ document.getElementById('taskInput').addEventListener('keypress', function(e) {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    switchLanguage('en');
+    updateDateDisplay();
+    renderTasks();
+});
 // Initialize the app
 updateDateDisplay();
-renderTasks();
