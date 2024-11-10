@@ -10,7 +10,14 @@ const translations = {
         deleteButton: 'Delete',
         statusPending: 'Pending',
         statusInProgress: 'In Progress',
-        statusCompleted: 'Completed'
+        statusCompleted: 'Completed',
+        prevWeek: 'Previous Week',
+        nextWeek: 'Next Week',
+        allStatus: 'All Status',
+        total: 'Total',
+        pending: 'Pending',
+        inProgress: 'In Progress',
+        completed: 'Completed'
     },
     zh: {
         title: '每日待办事项',
@@ -21,7 +28,14 @@ const translations = {
         deleteButton: '删除',
         statusPending: '待处理',
         statusInProgress: '进行中',
-        statusCompleted: '已完成'
+        statusCompleted: '已完成',
+        prevWeek: '上一周',
+        nextWeek: '下一周',
+        allStatus: '所有状态',
+        total: '总计',
+        pending: '待处理',
+        inProgress: '进行中',
+        completed: '已完成'
     }
 };
 
@@ -166,9 +180,9 @@ function deleteTask(dateStr, index) {
 // Get past week dates
 function getPastWeekDates() {
     const dates = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 6; i >= 0; i--) {
         const date = new Date();
-        date.setDate(date.getDate() - i);
+        date.setDate(date.getDate() - i + (weekOffset * 7));
         dates.push(date);
     }
     return dates;
@@ -207,8 +221,64 @@ function renderPastWeekTasks() {
             </div>
         `;
     }).join('');
+    const allTasks = dates.reduce((acc, date) => {
+        return acc.concat(loadTasks(formatDate(date)));
+    }, []);
+    updateStats(allTasks);
+    updateWeekRange();
 }
 
+// Current week offset (0 = current week)
+let weekOffset = 0;
+
+// Change week
+function changeWeek(offset) {
+    weekOffset += offset;
+    renderPastWeekTasks();
+    updateWeekRange();
+}
+
+// Update week range display
+function updateWeekRange() {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 6 + (weekOffset * 7));
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + (weekOffset * 7));
+    
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const range = `${startDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN' : 'en-US', options)} - ${endDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN' : 'en-US', options)}`;
+    document.getElementById('weekRange').textContent = range;
+}
+
+// Update statistics
+function updateStats(tasks) {
+    const stats = {
+        total: tasks.length,
+        pending: tasks.filter(t => t.status === 'pending').length,
+        inProgress: tasks.filter(t => t.status === 'in-progress').length,
+        completed: tasks.filter(t => t.status === 'completed').length
+    };
+    
+    document.getElementById('totalTasks').textContent = `Total: ${stats.total}`;
+    document.getElementById('pendingTasks').textContent = `Pending: ${stats.pending}`;
+    document.getElementById('inProgressTasks').textContent = `In Progress: ${stats.inProgress}`;
+    document.getElementById('completedTasks').textContent = `Completed: ${stats.completed}`;
+}
+
+// Filter tasks
+function filterTasks() {
+    const filter = document.getElementById('statusFilter').value;
+    const taskElements = document.querySelectorAll('li');
+    
+    taskElements.forEach(task => {
+        const status = task.querySelector('.status-badge').classList[1].replace('status-', '');
+        if (filter === 'all' || status === filter) {
+            task.style.display = '';
+        } else {
+            task.style.display = 'none';
+        }
+    });
+}
 // Listen for Enter key
 document.getElementById('taskInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
