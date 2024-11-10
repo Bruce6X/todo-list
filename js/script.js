@@ -140,29 +140,73 @@ function addTask() {
         
         saveTasks(dateStr, tasks);
         input.value = '';
-        renderTasks();
+        renderPastWeekTasks();
     }
 }
 
 // Toggle task status
-function toggleTask(index) {
-    const dateStr = formatDate(currentDate);
+function toggleTask(dateStr, index) {
     const tasks = loadTasks(dateStr);
     const statusOrder = ['pending', 'in-progress', 'completed'];
     const currentStatusIndex = statusOrder.indexOf(tasks[index].status);
     tasks[index].status = statusOrder[(currentStatusIndex + 1) % statusOrder.length];
     
     saveTasks(dateStr, tasks);
-    renderTasks();
+    renderPastWeekTasks();
 }
 
 // Delete task
-function deleteTask(index) {
-    const dateStr = formatDate(currentDate);
+function deleteTask(dateStr, index) {
     const tasks = loadTasks(dateStr);
     tasks.splice(index, 1);
     saveTasks(dateStr, tasks);
-    renderTasks();
+    renderPastWeekTasks();
+}
+
+// Get past week dates
+function getPastWeekDates() {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        dates.push(date);
+    }
+    return dates;
+}
+
+// Render all tasks for the past week
+function renderPastWeekTasks() {
+    const dates = getPastWeekDates();
+    const todoTiles = document.getElementById('todoTiles');
+    const t = translations[currentLanguage];
+    
+    todoTiles.innerHTML = dates.map(date => {
+        const dateStr = formatDate(date);
+        const tasks = loadTasks(dateStr);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const displayDate = date.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN' : 'en-US', options);
+        
+        return `
+            <div class="todo-tile">
+                <h2>${displayDate}</h2>
+                <ul id="taskList_${dateStr}">
+                    ${tasks.map((task, index) => `
+                        <li>
+                            <span class="task-number">${index + 1}.</span>
+                            <span class="task-text ${task.status === 'completed' ? 'completed' : ''}" 
+                                  onclick="toggleTask('${dateStr}', ${index})">
+                                ${task.text}
+                            </span>
+                            <span class="status-badge status-${task.status}">
+                                ${translations[currentLanguage]['status' + task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('-', '')]}
+                            </span>
+                            <button class="delete-btn" onclick="deleteTask('${dateStr}', ${index})">${t.deleteButton}</button>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    }).join('');
 }
 
 // Listen for Enter key
@@ -174,8 +218,8 @@ document.getElementById('taskInput').addEventListener('keypress', function(e) {
 
 document.addEventListener('DOMContentLoaded', function() {
     switchLanguage('en');
-    updateDateDisplay();
-    renderTasks();
+    renderPastWeekTasks();
 });
+
 // Initialize the app
 updateDateDisplay();
