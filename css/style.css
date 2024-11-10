@@ -80,14 +80,13 @@ ul {
 }
 
 li {
-    display: flex;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: 40px minmax(200px, 1fr) 100px 80px;
     align-items: center;
     padding: 10px;
     margin-bottom: 5px;
     background-color: #f9f9f9;
     border-radius: 4px;
-    flex-wrap: wrap;
     gap: 10px;
 }
 
@@ -166,9 +165,10 @@ select {
 }
 
 .task-text {
-    flex: 1;
-    min-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
     word-break: break-word;
-    text-align: left;
-    margin-right: auto;
+    min-height: 24px;
+    padding-right: 10px;
 }
