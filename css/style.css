@@ -81,12 +81,14 @@ ul {
 
 li {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 10px;
     margin-bottom: 5px;
     background-color: #f9f9f9;
     border-radius: 4px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .task-number {
@@ -161,4 +163,12 @@ select {
 .language-switch button.active {
     background-color: #1873CC;
     font-weight: bold;
+}
+
+.task-text {
+    flex: 1;
+    min-width: 200px;
+    word-break: break-word;
+    text-align: left;
+    margin-right: auto;
 }
